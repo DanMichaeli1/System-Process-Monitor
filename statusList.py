@@ -18,29 +18,38 @@ class StatusList:
         with open(filename, "a") as f:
             f.write(separator + "\n")
             f.write(time.ctime() + "\n")
-            f.write("New processes:\n")
-            for p in new_process_list:
-                start_time = datetime.datetime.fromtimestamp(p.create_time()).strftime("%Y-%m-%d %H:%M:%S")
-                with p.oneshot():
-                    try:
-                        exe = p.exe()
-                        uname = p.username()
-                    except:
-                        exe = ""
-                        uname = "-"
-                        pass
-                    f.write(format % (start_time, uname, p.name(), p.pid, exe))
+            print(separator)
+            print(time.ctime() + "\n")
+            if new_process_list:
+                f.write("New processes:\n")
+                print "New Processes:\n"
+                for p in new_process_list:
+                    start_time = datetime.datetime.fromtimestamp(p.create_time()).strftime("%Y-%m-%d %H:%M:%S")
+                    with p.oneshot():
+                        try:
+                            exe = p.exe()
+                            uname = p.username()
+                        except:
+                            exe = ""
+                            uname = "-"
+                            pass
+                        print(format % (start_time, uname, p.name(), p.pid, exe))
+                        f.write(format % (start_time, uname, p.name(), p.pid, exe))
                 f.write("\n")
-
-            f.write("\n\nStopped processes:\n")
-            for p in stopped_process_list:
-                with p.oneshot():
-                    try:
-                        exe = p.exe()
-                        uname = p.username()
-                    except:
-                        exe = ""
-                        uname = "-"
-                        pass
-                    f.write(format2 % (uname, p.name(), p.pid, exe))
+                print "\n"
+            if stopped_process_list:
+                f.write("Stopped processes:\n")
+                print "Stopped processes:\n"
+                for p in stopped_process_list:
+                    with p.oneshot():
+                        try:
+                            exe = p.exe()
+                            uname = p.username()
+                        except:
+                            exe = ""
+                            uname = "-"
+                            pass
+                        print(format2 % (uname, p.name(), p.pid, exe))
+                        f.write(format2 % (uname, p.name(), p.pid, exe))
                 f.write("\n")
+            print(separator)
