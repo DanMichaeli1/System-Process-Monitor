@@ -7,16 +7,22 @@ __author__ = 'Dan'
 import os
 import psutil
 import time
+import logging
+from watchdog.observers import Observer
+from watchdog.events import LoggingEventHandler
 
 
 class ProcessList:
     __log_folder_path = ""
-    __interval = ""
+    __interval = 120
 
     def __init__(self, interval):
         self.__log_folder_path = raw_input("log folder address: ").strip()
         self.__interval = interval
         self.status_list = StatusList(self.__log_folder_path)
+        logging.basicConfig(level=logging.INFO,
+                            format='%(asctime)s - %(message)s',
+                            datefmt='%Y-%m-%d %H:%M:%S')
 
     # processList.txt writing function
     def write_log(self):
@@ -50,14 +56,20 @@ class ProcessList:
                         f.write(format2 % (uname, p.name(), p.pid, exe))
                     f.write("\n\n")
             print "Finished log update!"
+            event_handler = LoggingEventHandler()
+            observer = Observer()
+            observer.schedule(event_handler, path=self.__log_folder_path, recursive=False)
+            observer.start()
             time.sleep(self.__interval)
+            observer.stop()
             self.check_for_process_changes(procs_list)
             print "writing new log data!"
 
-    # checks for process changes in the system by creating a new process list and comparing it to procs (old list)
+
+# checks for process changes in the system by creating a new process list and comparing it to procs (old list)
     def check_for_process_changes(self, procs):
         print "Checking for process changes..."
-        new_procs_list = list(psutil.process_iter()) # creating a new processes list
+        new_procs_list = list(psutil.process_iter())  # creating a new processes list
         new_procs_list = sorted(new_procs_list, key=lambda proc: proc.name)
         s = set(new_procs_list)
         ''' if p is is procs(old list) and is not in s(newProcsList) then the process stopped in the interval time '''

@@ -35,7 +35,7 @@ class StatusList:
                             pass
                         print(format % (start_time, uname, p.name(), p.pid, exe))
                         f.write(format % (start_time, uname, p.name(), p.pid, exe))
-                f.write("\n")
+                        f.write("\n")
                 print "\n"
             if stopped_process_list:
                 f.write("Stopped processes:\n")

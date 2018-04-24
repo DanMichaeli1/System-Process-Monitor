@@ -1,7 +1,8 @@
 from processList import ProcessList
-import logsWatcher
+#import logsWatcher
 
 __author__ = 'Dan'
 
-p = ProcessList(5)
+interval = float(raw_input("Please input log update interval (in seconds): "))
+p = ProcessList(interval)
 p.write_log()
