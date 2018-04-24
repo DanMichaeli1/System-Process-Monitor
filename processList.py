@@ -14,7 +14,7 @@ from watchdog.events import LoggingEventHandler
 
 class ProcessList:
     __log_folder_path = ""
-    __interval = 120
+    __interval = 0
 
     def __init__(self, interval):
         self.__log_folder_path = raw_input("log folder address: ").strip()
