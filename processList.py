@@ -8,6 +8,7 @@ import os
 import psutil
 import time
 import logging
+from datetime import datetime
 from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler
 
@@ -24,23 +25,23 @@ class ProcessList:
                             format='%(asctime)s - %(message)s',
                             datefmt='%Y-%m-%d %H:%M:%S')
 
+    def get_log(self):
+        return self.__log_folder_path
+
     # processList.txt writing function
     def write_log(self):
         if not os.path.exists(self.__log_folder_path):
             os.mkdir(self.__log_folder_path)
 
         separator = "-" * 80
-        format = "%30s %10s %s"
-        format2 = "(%s) %30s, %10d, %s"
+        format2 = "(%s), %30s, %10d, %s"
         while 1:
             procs_list = list(psutil.process_iter())
             procs_list = sorted(procs_list, key=lambda procList: procList.name)
 
             log_path = self.__log_folder_path + '\\processList.txt'
             with open(log_path, "a") as f:
-                f.write(separator + "\n")
-                f.write(time.ctime() + "\n")
-                f.write(format % ("NAME", "PID", "PATH"))
+                f.write(datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + "\n")
                 f.write("\n")
 
                 for p in procs_list:
@@ -54,7 +55,8 @@ class ProcessList:
                             uname = "-"
                             pass
                         f.write(format2 % (uname, p.name(), p.pid, exe))
-                    f.write("\n\n")
+                    f.write("\n")
+                f.write(separator + "\n")
             print "Finished log update!"
             event_handler = LoggingEventHandler()
             observer = Observer()
