@@ -1,7 +1,7 @@
-from statusList import StatusList
-
 __author__ = 'Dan'
 
+
+from statusList import StatusList
 # logFolderPath = 'C:\Users\Dan\Desktop\New Folder'
 
 import os
@@ -18,8 +18,9 @@ class ProcessList:
     __interval = 0
 
     def __init__(self, interval):
-        self.__log_folder_path = raw_input("log folder address: ").strip()
+        self.__log_folder_path = 'C:\Users\USER\Desktop\Process logs' #raw_input("log folder address: ").strip()
         self.__interval = interval
+        self.__sample_list = []
         self.status_list = StatusList(self.__log_folder_path)
         logging.basicConfig(level=logging.INFO,
                             format='%(asctime)s - %(message)s',
@@ -41,7 +42,9 @@ class ProcessList:
 
             log_path = self.__log_folder_path + '\\processList.txt'
             with open(log_path, "a") as f:
-                f.write(datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S') + "\n")
+                sample_time = datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+                self.__sample_list.append(sample_time)
+                f.write(sample_time + "\n")
                 f.write("\n")
 
                 for p in procs_list:
