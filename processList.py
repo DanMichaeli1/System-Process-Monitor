@@ -17,7 +17,7 @@ class ProcessList:
     __log_folder_path = ""
     __interval = 0
 
-    def __init__(self, interval):
+    def __init__(self, logfolder, interval):
         self.__log_folder_path = 'C:\Users\USER\Desktop\Process logs' #raw_input("log folder address: ").strip()
         self.__interval = interval
         self.__sample_list = []
@@ -29,6 +29,12 @@ class ProcessList:
     def get_log(self):
         return self.__log_folder_path
 
+    def set_log_folder(self, logfolder):
+        self.__log_folder_path = logfolder
+
+    def set_interval(self, interval):
+        self.__interval = interval
+
     # processList.txt writing function
     def write_log(self):
         if not os.path.exists(self.__log_folder_path):
@@ -36,39 +42,43 @@ class ProcessList:
 
         separator = "-" * 80
         format2 = "(%s), %30s, %10d, %s"
-        while 1:
-            procs_list = list(psutil.process_iter())
-            procs_list = sorted(procs_list, key=lambda procList: procList.name)
+        try:
+            while True:
+                procs_list = list(psutil.process_iter())
+                procs_list = sorted(procs_list, key=lambda procList: procList.name)
 
-            log_path = self.__log_folder_path + '\\processList.txt'
-            with open(log_path, "a") as f:
-                sample_time = datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-                self.__sample_list.append(sample_time)
-                f.write(sample_time + "\n")
-                f.write("\n")
-
-                for p in procs_list:
-                    with p.oneshot():  # faster than pulling info from p a variable at a time
-
-                        try:
-                            exe = p.exe()
-                            uname = p.username()
-                        except:
-                            exe = ""
-                            uname = "-"
-                            pass
-                        f.write(format2 % (uname, p.name(), p.pid, exe))
+                log_path = self.__log_folder_path + '\\processList.txt'
+                with open(log_path, "a") as f:
+                    sample_time = datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+                    self.__sample_list.append(sample_time)
+                    f.write(sample_time + "\n")
                     f.write("\n")
-                f.write(separator + "\n")
-            print "Finished log update!"
-            event_handler = LoggingEventHandler()
-            observer = Observer()
-            observer.schedule(event_handler, path=self.__log_folder_path, recursive=False)
-            observer.start()
-            time.sleep(self.__interval)
-            observer.stop()
-            self.check_for_process_changes(procs_list)
-            print "writing new log data!"
+
+                    for p in procs_list:
+                        with p.oneshot():  # faster than pulling info from p a variable at a time
+
+                            try:
+                                exe = p.exe()
+                                uname = p.username()
+                            except:
+                                exe = ""
+                                uname = "-"
+                                pass
+                            f.write(format2 % (uname, p.name(), p.pid, exe))
+                        f.write("\n")
+                    f.write(separator + "\n")
+                print "Finished log update!"
+                event_handler = LoggingEventHandler()
+                observer = Observer()
+                observer.schedule(event_handler, path=self.__log_folder_path, recursive=False)
+                observer.start()
+                time.sleep(self.__interval)
+                observer.stop()
+                self.check_for_process_changes(procs_list)
+                print "writing new log data!"
+        except KeyboardInterrupt:
+            print('Logging stopped!')
+
 
 
 # checks for process changes in the system by creating a new process list and comparing it to procs (old list)
